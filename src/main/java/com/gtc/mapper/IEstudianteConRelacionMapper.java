@@ -7,17 +7,16 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
-public interface IEstudianteConRelacionMapper extends IMapper<Estudiante, EstudianteInpDto, EstudianteResDto>{
+public interface IEstudianteConRelacionMapper extends IMapper<Estudiante, EstudianteInpDto, EstudianteResDto> {
 
-    @Override
+    @Mapping(target = "estudianteAsignaturas", ignore = true)
     @Mapping(target = "tipoDocumento", ignore = true)
-    @Mapping(target = "id", ignore = true )
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "grado", ignore = true)
     @Mapping(target = "dane", ignore = true)
     @Mapping(target = "asignaturas", ignore = true)
     Estudiante aEntidad(EstudianteInpDto estudianteInpDto);
 
-    @Override
     @Mapping(target = "asignaturaResDtoList", source = "asignaturas")
     @Mapping(target = "tipoDocumentoResDto", source = "tipoDocumento")
     @Mapping(target = "gradoResDto", source = "grado")

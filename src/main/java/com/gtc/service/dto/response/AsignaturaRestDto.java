@@ -1,14 +1,11 @@
 package com.gtc.service.dto.response;
 
-import com.gtc.service.dto.response.sin_otra_clase.DocenteResDto;
-import com.gtc.service.dto.response.sin_otra_clase.EstudianteResDto;
-import lombok.Data;
+import com.gtc.service.dto.response.model.DocenteResDto;
+import com.gtc.service.dto.response.model.EstudianteResDto;
 
 import java.util.List;
 
-@Data
-public class AsignaturaRestDto {
-    private String descripcion;
-    private DocenteResDto docente;
-    private List<EstudianteResDto> estudianteResDtos;
+public record AsignaturaRestDto(String descripcion, DocenteResDto docente,
+                                List<EstudianteResDto> estudianteResDtos) {
+
 }

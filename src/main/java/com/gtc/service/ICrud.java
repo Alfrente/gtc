@@ -12,5 +12,5 @@ public interface ICrud<O, I> {
 
     void delete(Long id);
 
-    O update(Long id, I i);
+
 }

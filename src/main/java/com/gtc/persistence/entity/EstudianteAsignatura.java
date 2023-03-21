@@ -1,16 +1,20 @@
 package com.gtc.persistence.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "EstudianteAsignatura")
-@Data
 public class EstudianteAsignatura {
-    //@GeneratedValue(generator = "")
-    @EmbeddedId
-    private EstudianteAsignaturaFk estudianteAsignaturaFk;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private Long idEstudiante;
+    private Long idAsignatura;
     private Double nota;
     private Integer periodo;
 

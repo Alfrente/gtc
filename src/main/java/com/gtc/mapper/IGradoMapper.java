@@ -10,7 +10,6 @@ import org.mapstruct.Mapping;
 public interface IGradoMapper extends IMapper<Grado, GradoInpDto, GradoResDto>{
 
     @Mapping(target = "id", ignore = true)
-    @Override
     Grado aEntidad(GradoInpDto gradoInpDto);
 
 }

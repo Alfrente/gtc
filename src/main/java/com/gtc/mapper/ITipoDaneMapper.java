@@ -9,7 +9,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ITipoDaneMapper extends IMapper<TipoDane, TipoDaneInpDto, TipoDaneResDto> {
 
-    @Override
     @Mapping(target = "id", ignore = true)
     TipoDane aEntidad(TipoDaneInpDto tipoDaneInpDto);
 }

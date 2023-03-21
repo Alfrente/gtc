@@ -1,6 +1,7 @@
 package com.gtc.service.impl;
 
 import com.gtc.exception.ExceptionGtc;
+import com.gtc.mapper.EstudianteResponseMapper;
 import com.gtc.mapper.IEstudianteConRelacionMapper;
 import com.gtc.persistence.entity.Estudiante;
 import com.gtc.persistence.repository.IEstudianteRepository;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static com.gtc.util.MetodosEstatico.longValue;
 import static com.gtc.util.MetodosEstatico.validarFecha;
 
 @Service
@@ -28,6 +30,11 @@ public class EstudianteService implements ICrud<EstudianteResDto, EstudianteInpD
     private final IEstudianteRepository repository;
     private final IEstudianteConRelacionMapper mapper;
 
+    private final EstudianteResponseMapper estudianteResponseMapper;
+    private final DaneService daneService;
+    private final GradoService gradoService;
+    private final TipoDocumentoService tipoDocumentoService;
+
     @Override
     public EstudianteResDto getById(Long id) {
         return mapper.aOutDto(repository.findById(id).orElse(null));
@@ -35,13 +42,17 @@ public class EstudianteService implements ICrud<EstudianteResDto, EstudianteInpD
 
     @Override
     public List<EstudianteResDto> getAll() {
-        return mapper.aOutDtoList(repository.findAll());
+        return mapper.aOutDtoList(getAllEstudiante());
     }
 
     @Override
     @Transactional
-    public EstudianteResDto save(EstudianteInpDto estudianteDto) {
-        return mapper.aOutDto(repository.save(mapper.aEntidad(estudianteDto)));
+    public EstudianteResDto save(EstudianteInpDto dto) { //
+        validarFecha(dto.fechaNacimiento());
+        validarDane(longValue(dto.idDane()));
+        validarGrado(longValue(dto.idGrado()));
+        validarTipoDocumento(longValue(dto.idTipoDocumento()));
+        return mapper.aOutDto(repository.save(mapper.aEntidad(dto)));
     }
 
     @Override
@@ -51,18 +62,20 @@ public class EstudianteService implements ICrud<EstudianteResDto, EstudianteInpD
         repository.deleteById(id);
     }
 
-    @Override
+  /*
     @Transactional
     public EstudianteResDto update(Long id, EstudianteInpDto estudianteDto) {
         Estudiante estudianteDb = validarIdBd(id);
         return mapper.aOutDto(repository.save(validarCampoModificar(estudianteDto, estudianteDb)));
-    }
-
+    }*/
 
     @Transactional
-    public EstudianteResDto update(Long id, EstudianteInpUpdDto estudianteDto) {
+    public EstudianteResDto update(Long id, EstudianteInpUpdDto inpDto) { //
         Estudiante estudianteDb = validarIdBd(id);
-        return mapper.aOutDto(repository.save(validarCampoModificar(estudianteDto, estudianteDb)));
+        validarDane(longValue(inpDto.idDane()));
+        validarGrado(longValue(inpDto.idGrado()));
+        validarTipoDocumento(longValue(inpDto.idTipoDocumento()));
+        return mapper.aOutDto(repository.save(validarCampoModificar(inpDto, estudianteDb)));
     }
 
     private Estudiante validarIdBd(Long id) {
@@ -76,41 +89,54 @@ public class EstudianteService implements ICrud<EstudianteResDto, EstudianteInpD
         return estudiante.get();
     }
 
-    private Estudiante validarCampoModificar(Object dto, Estudiante estudianteDb) {
+    private Estudiante validarCampoModificar(Object inpDto, Estudiante estudianteDb) {
 
-        if (dto == null)
+        if (inpDto == null)
             throw new ExceptionGtc("Ingrese la informacion requerida");
 
-        EstudianteInpDto dato = (EstudianteInpDto) dto;
+        EstudianteInpDto dato = (EstudianteInpDto) inpDto;
 
-        if (validarFecha(dato.getFechaNacimiento()))
-            throw new ExceptionGtc("La fecha ingresada es incorrecta");
+        validarFecha(dato.fechaNacimiento());
 
-        estudianteDb.setNumeroDocumento(dato.getNumeroDocumento() != null ? longValue(dato.getNumeroDocumento()) :
+        estudianteDb.setNumeroDocumento(dato.numeroDocumento() != null ? longValue(dato.numeroDocumento()) :
                 estudianteDb.getNumeroDocumento());
-        estudianteDb.setNombres(dato.getNombres() != null ? dato.getNombres() : estudianteDb.getNombres());
-        estudianteDb.setApellidos(dato.getApellidos() != null ? dato.getApellidos() : estudianteDb.getApellidos());
-        estudianteDb.setFechaNacimiento(dato.getFechaNacimiento() != null ? LocalDate.parse(dato.getFechaNacimiento()) :
+        estudianteDb.setNombres(dato.nombres() != null ? dato.nombres() : estudianteDb.getNombres());
+        estudianteDb.setApellidos(dato.apellidos() != null ? dato.apellidos() : estudianteDb.getApellidos());
+        estudianteDb.setFechaNacimiento(dato.fechaNacimiento() != null ? LocalDate.parse(dato.fechaNacimiento()) :
                 estudianteDb.getFechaNacimiento());
-        estudianteDb.setDireccion(dato.getDireccion() != null ? dato.getDireccion() : estudianteDb.getDireccion());
-        estudianteDb.setEmail(dato.getEmail() != null ? dato.getEmail() : estudianteDb.getEmail());
-        estudianteDb.setFijo(dato.getFijo() != null ? longValue(dato.getFijo()) : estudianteDb.getFijo());
-        estudianteDb.setCelular(dato.getCelular() != null ? longValue(dato.getCelular()) : estudianteDb.getCelular());
-        estudianteDb.getGrado().setId(dato.getIdGrado() != null ? longValue(dato.getIdGrado()) :
+        estudianteDb.setDireccion(dato.direccion() != null ? dato.direccion() : estudianteDb.getDireccion());
+        estudianteDb.setEmail(dato.email() != null ? dato.email() : estudianteDb.getEmail());
+        estudianteDb.setFijo(dato.fijo() != null ? longValue(dato.fijo()) : estudianteDb.getFijo());
+        estudianteDb.setCelular(dato.celular() != null ? longValue(dato.celular()) : estudianteDb.getCelular());
+        estudianteDb.getGrado().setId(dato.idGrado() != null ? longValue(dato.idGrado()) :
                 estudianteDb.getGrado().getId());
-        estudianteDb.getTipoDocumento().setId(dato.getIdGrado() != null ? longValue(dato.getIdGrado()) :
+        estudianteDb.getTipoDocumento().setId(dato.idGrado() != null ? longValue(dato.idGrado()) :
                 estudianteDb.getTipoDocumento().getId());
 
         return estudianteDb;
     }
 
-
     public List<SDto> getEstudiantesJoinNota() {
-        //return repository.estudiantesJoinNota();
-        return null;
+        return estudianteResponseMapper.aSDtoList(getAllEstudiante());
     }
 
-    private Long longValue(String valor) {
-        return Long.valueOf(valor);
+    public List<Estudiante> getAllEstudiante() {
+        return repository.findAll();
     }
+
+    private void validarDane(Long idDane) {
+        if (idDane != null && daneService.getById(idDane) == null)
+            throw new ExceptionGtc("El id dane " + idDane + " no disponible");
+    }
+
+    private void validarGrado(Long idGrado) {
+        if (idGrado != null && gradoService.getById(idGrado) == null)
+            throw new ExceptionGtc("El id grado " + idGrado + " no disponible");
+    }
+
+    private void validarTipoDocumento(Long idTipoDocumento) {
+        if (idTipoDocumento != null && tipoDocumentoService.getById(idTipoDocumento) == null)
+            throw new ExceptionGtc("El id tipo documento " + idTipoDocumento + " no disponible");
+    }
+
 }

@@ -1,9 +1,6 @@
 package com.gtc.controller;
 
-import com.gtc.service.dto.request.EstudianteInpDto;
 import com.gtc.service.dto.request.GradoInpDto;
-import com.gtc.service.dto.request.update.EstudianteInpUpdDto;
-import com.gtc.service.dto.response.EstudianteResDto;
 import com.gtc.service.dto.response.GradoResDto;
 import com.gtc.service.impl.GradoService;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +39,7 @@ public class GradoController {
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<GradoResDto> update(@PathVariable("id") Long id, @RequestBody @Valid GradoInpDto inpDto) {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.update(id, inpDto));
+    public ResponseEntity<GradoResDto> update(@PathVariable("id") Long id, @RequestParam("nombreGrado") String nuevoTipoDane) {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.update(id, nuevoTipoDane));
     }
 }

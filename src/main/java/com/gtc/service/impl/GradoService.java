@@ -40,21 +40,13 @@ public class GradoService implements ICrud<GradoResDto, GradoInpDto> {
         repository.deleteById(id);
     }
 
-    @Override
-    public GradoResDto update(Long id, GradoInpDto gradoInpDto) {
+    public GradoResDto update(Long id, String nuevoTipoDane) {
         Grado grado = validarIdBd(id);
-        return mapper.aOutDto(repository.save(validarCampoModificar(gradoInpDto, grado)));
+        grado.setDescripcion(nuevoTipoDane);
+        return mapper.aOutDto(repository.save(grado));
     }
 
-    private Grado validarCampoModificar(GradoInpDto inpDto, Grado grado) {
 
-        if (inpDto == null)
-            throw new ExceptionGtc("Ingrese la informacion requerida");
-
-        grado.setDescripcion(inpDto.getDescripcion() != null ? inpDto.getDescripcion() : grado.getDescripcion());
-
-        return grado;
-    }
 
     private Grado validarIdBd(Long id) {
         if (id == null)
@@ -66,4 +58,5 @@ public class GradoService implements ICrud<GradoResDto, GradoInpDto> {
 
         return grado.get();
     }
+
 }

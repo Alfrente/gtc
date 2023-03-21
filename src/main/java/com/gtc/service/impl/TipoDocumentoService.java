@@ -41,20 +41,11 @@ public class TipoDocumentoService implements ICrud<TipoDocumentoResDto, TipoDocu
         repository.deleteById(id);
     }
 
-    @Override
-    public TipoDocumentoResDto update(Long id, TipoDocumentoInpDto inpDto) {
+
+    public TipoDocumentoResDto update(Long id, String nuevoTipoDocumento) {
         TipoDocumento tipoDocumento = validarIdBd(id);
-        return mapper.aOutDto(repository.save(validarCampoModificar(inpDto, tipoDocumento)));
-    }
-
-    private TipoDocumento validarCampoModificar(TipoDocumentoInpDto inpDto, TipoDocumento tipoDocumento) {
-
-        if (inpDto == null)
-            throw new ExceptionGtc("Ingrese la informacion requerida");
-
-        tipoDocumento.setDescripcion(inpDto.getDescripcion() != null ? inpDto.getDescripcion() : tipoDocumento.getDescripcion());
-
-        return tipoDocumento;
+        tipoDocumento.setDescripcion(nuevoTipoDocumento);
+        return mapper.aOutDto(repository.save(tipoDocumento));
     }
 
     private TipoDocumento validarIdBd(Long id) {
@@ -67,4 +58,5 @@ public class TipoDocumentoService implements ICrud<TipoDocumentoResDto, TipoDocu
 
         return tipoDocumento.get();
     }
+
 }

@@ -40,7 +40,8 @@ public class TipoDocumentoController {
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<TipoDocumentoResDto> update(@PathVariable("id") Long id, @RequestBody @Valid TipoDocumentoInpDto inpDto) {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.update(id, inpDto));
+    public ResponseEntity<TipoDocumentoResDto> update(@PathVariable("id") Long id, @RequestParam("nuevoTipoDocumento")
+    String nuevoTipoDocumento) {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.update(id, nuevoTipoDocumento));
     }
 }

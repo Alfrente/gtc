@@ -1,13 +1,15 @@
 package com.gtc.persistence.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "Asignatura")
-@Data
 public class Asignatura {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

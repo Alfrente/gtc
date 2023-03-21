@@ -1,14 +1,16 @@
 package com.gtc.persistence.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "Estudiante")
-@Data
 public class Estudiante {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,8 +49,12 @@ public class Estudiante {
     private Dane dane;
 
     @ManyToMany
-    @JoinTable(name = "EstudianteAsignatura", joinColumns = @JoinColumn(name = "idAsignatura"),
-            inverseJoinColumns = @JoinColumn(name = "idEstudiante")
+    @JoinTable(name = "EstudianteAsignatura", joinColumns = @JoinColumn(name = "idEstudiante"),
+            inverseJoinColumns = @JoinColumn(name = "idAsignatura")
     )
     private List<Asignatura> asignaturas;
+
+    @OneToMany
+    @JoinColumn(name = "idEstudiante", insertable = false, updatable = false)
+    private List<EstudianteAsignatura> estudianteAsignaturas;
 }

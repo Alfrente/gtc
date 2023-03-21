@@ -16,13 +16,17 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static com.gtc.util.MetodosEstatico.longValue;
+
 @Service
 @RequiredArgsConstructor
 public class DocenteService implements ICrud<DocenteResDto, DocenteInpDto> {
 
     private final IDocenteRepository repository;
     private final IDocenteConRelacionMapper relacionMapper;
-    private final IDocenteMapper mapper;
+    private final IDocenteMapper mapper; //
+    private final TipoDocumentoService tipoDocumentoService;
+    private final GradoService gradoService;
 
     @Override
     public DocenteResDto getById(Long id) {
@@ -36,8 +40,10 @@ public class DocenteService implements ICrud<DocenteResDto, DocenteInpDto> {
 
     @Override
     @Transactional
-    public DocenteResDto save(DocenteInpDto dto) {
-        return relacionMapper.aOutDto(relacionMapper.aEntidad(dto));
+    public DocenteResDto save(DocenteInpDto inpDto) {
+        validarTipoDocumento(longValue(inpDto.idTipoDocumento()));
+        validarGrado(longValue(inpDto.idGradoResponsable()));
+        return relacionMapper.aOutDto(relacionMapper.aEntidad(inpDto));
     }
 
     @Override
@@ -47,10 +53,11 @@ public class DocenteService implements ICrud<DocenteResDto, DocenteInpDto> {
         repository.deleteById(id);
     }
 
-    @Override
     @Transactional
     public DocenteResDto update(Long id, DocenteInpDto inpDto) {
         Docente docente = validarDocenteIdBd(id);
+        validarTipoDocumento(longValue(inpDto.idTipoDocumento()));
+        validarGrado(longValue(inpDto.idGradoResponsable()));
         return relacionMapper.aOutDto(repository.save(validarCampoModificar(inpDto, docente)));
     }
 
@@ -70,20 +77,25 @@ public class DocenteService implements ICrud<DocenteResDto, DocenteInpDto> {
         if (inpDto == null)
             throw new ExceptionGtc("Ingrese la informacion requerida");
 
-        docente.setNumeroDocumento(inpDto.getNumeroDocumento() != null ? longValue(inpDto.getNumeroDocumento()) : docente.getNumeroDocumento());
-        docente.setNombres(inpDto.getNombres() != null ? inpDto.getNombres() : docente.getNombres());
-        docente.setApellidos(inpDto.getApellidos() != null ? inpDto.getApellidos() : docente.getApellidos());
-        docente.setFechaNacimiento(inpDto.getFechaNacimiento() != null ? LocalDate.parse(inpDto.getFechaNacimiento()) : docente.getFechaNacimiento());
-        docente.setAsigDictadas(inpDto.getAsigDictadas() != null ? inpDto.getAsigDictadas() : docente.getAsigDictadas());
-        docente.setGradoEscolaridad(inpDto.getGradoEscolaridad() != null ? inpDto.getGradoEscolaridad() : docente.getGradoEscolaridad());
-        docente.setEmail(inpDto.getEmail() != null ? inpDto.getEmail() : docente.getEmail());
-        docente.setFijo(inpDto.getFijo() != null ? longValue(inpDto.getFijo()) : docente.getFijo());
-        docente.setCelular(inpDto.getCelular() != null ? longValue(inpDto.getCelular()) : docente.getCelular());
+        docente.setNumeroDocumento(inpDto.numeroDocumento() != null ? longValue(inpDto.numeroDocumento()) : docente.getNumeroDocumento());
+        docente.setNombres(inpDto.nombres() != null ? inpDto.nombres() : docente.getNombres());
+        docente.setApellidos(inpDto.apellidos() != null ? inpDto.apellidos() : docente.getApellidos());
+        docente.setFechaNacimiento(inpDto.fechaNacimiento() != null ? LocalDate.parse(inpDto.fechaNacimiento()) : docente.getFechaNacimiento());
+        docente.setAsigDictadas(inpDto.asigDictadas() != null ? inpDto.asigDictadas() : docente.getAsigDictadas());
+        docente.setGradoEscolaridad(inpDto.gradoEscolaridad() != null ? inpDto.gradoEscolaridad() : docente.getGradoEscolaridad());
+        docente.setEmail(inpDto.email() != null ? inpDto.email() : docente.getEmail());
+        docente.setFijo(inpDto.fijo() != null ? longValue(inpDto.fijo()) : docente.getFijo());
+        docente.setCelular(inpDto.celular() != null ? longValue(inpDto.celular()) : docente.getCelular());
 
         return docente;
     }
+    private void validarTipoDocumento(Long idTipoDocumento) {
+        if (idTipoDocumento != null && tipoDocumentoService.getById(idTipoDocumento) == null)
+            throw new ExceptionGtc("El id tipo documento " + idTipoDocumento + " no disponible");
+    }
 
-    private Long longValue(String valor) {
-        return Long.valueOf(valor);
+    private void validarGrado(Long idGrado) {
+        if (idGrado != null && gradoService.getById(idGrado) == null)
+            throw new ExceptionGtc("El id grado " + idGrado + " no disponible");
     }
 }

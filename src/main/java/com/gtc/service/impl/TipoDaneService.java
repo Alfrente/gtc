@@ -41,23 +41,13 @@ public class TipoDaneService implements ICrud<TipoDaneResDto, TipoDaneInpDto> {
         repository.deleteById(id);
     }
 
-    @Override
-    public TipoDaneResDto update(Long id, TipoDaneInpDto inpDto) {
+    public TipoDaneResDto update(Long id, String nuevoTipoDane) {
         TipoDane tipoDane = validarIdBd(id);
-        return mapper.aOutDto(validarCampoModificar(inpDto, tipoDane));
+        tipoDane.setDescripcion(nuevoTipoDane);
+        return mapper.aOutDto(tipoDane);
     }
 
-    private TipoDane validarCampoModificar(TipoDaneInpDto inpDto, TipoDane tipoDane) {
-
-        if (inpDto == null)
-            throw new ExceptionGtc("Ingrese la informacion requerida");
-
-        tipoDane.setDescripcion(inpDto.getDescripcion() != null ? inpDto.getDescripcion() : tipoDane.getDescripcion());
-
-        return tipoDane;
-    }
-
-    private TipoDane validarIdBd(Long id) {
+    public TipoDane validarIdBd(Long id) {
         if (id == null)
             throw new ExceptionGtc("El id esta nulo");
 
@@ -67,4 +57,5 @@ public class TipoDaneService implements ICrud<TipoDaneResDto, TipoDaneInpDto> {
 
         return tipoDane.get();
     }
+
 }

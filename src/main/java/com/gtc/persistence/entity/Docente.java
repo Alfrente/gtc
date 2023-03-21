@@ -1,14 +1,16 @@
 package com.gtc.persistence.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "Docente")
-@Data
 public class Docente {
 
     @Id
@@ -34,4 +36,22 @@ public class Docente {
     private Grado grado;
     @OneToMany(mappedBy = "docente")
     private List<Asignatura> asignaturaList;
+
+    @Override
+    public String toString() {
+        return "Docente{" +
+                "id=" + id +
+                ", numeroDocumento=" + numeroDocumento +
+                ", nombres='" + nombres + '\'' +
+                ", apellidos='" + apellidos + '\'' +
+                ", fechaNacimiento=" + fechaNacimiento +
+                ", asigDictadas='" + asigDictadas + '\'' +
+                ", gradoEscolaridad='" + gradoEscolaridad + '\'' +
+                ", email='" + email + '\'' +
+                ", fijo=" + fijo +
+                ", celular=" + celular +
+                ", idTipoDocumento=" + idTipoDocumento +
+                ", idGradoResponsable=" + idGradoResponsable +
+                '}';
+    }
 }

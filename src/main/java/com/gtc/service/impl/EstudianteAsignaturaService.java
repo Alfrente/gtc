@@ -3,7 +3,6 @@ package com.gtc.service.impl;
 import com.gtc.exception.ExceptionGtc;
 import com.gtc.mapper.IEstudianteAsignaturaMapper;
 import com.gtc.persistence.entity.EstudianteAsignatura;
-import com.gtc.persistence.entity.EstudianteAsignaturaFk;
 import com.gtc.persistence.repository.IEstudianteAsignaturaRepository;
 import com.gtc.service.ICrud;
 import com.gtc.service.dto.request.EstudianteAsignaturaInpDto;
@@ -14,12 +13,17 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.gtc.util.MetodosEstatico.*;
+
 @Service
 @RequiredArgsConstructor
 public class EstudianteAsignaturaService implements ICrud<EstudianteAsignaturaResDto, EstudianteAsignaturaInpDto> {
 
     private final IEstudianteAsignaturaRepository repository;
     private final IEstudianteAsignaturaMapper mapper;
+    private final AsignaturaService asignaturaService;
+    private final EstudianteService estudianteService;
+
 
     @Override
     public EstudianteAsignaturaResDto getById(Long id) {
@@ -33,6 +37,8 @@ public class EstudianteAsignaturaService implements ICrud<EstudianteAsignaturaRe
 
     @Override
     public EstudianteAsignaturaResDto save(EstudianteAsignaturaInpDto inpDto) {
+        validarAsignatura(longValue(inpDto.idAsignatura()));
+        validarEstudiante(longValue(inpDto.idEstudiante()));
         return mapper.aOutDto(repository.save(mapper.aEntidad(inpDto)));
     }
 
@@ -41,38 +47,26 @@ public class EstudianteAsignaturaService implements ICrud<EstudianteAsignaturaRe
         repository.deleteById(id);
     }
 
-    @Override
-    public EstudianteAsignaturaResDto update(Long id, EstudianteAsignaturaInpDto estudianteAsignaturaInpDto) {
+
+    public EstudianteAsignaturaResDto update(Long id, EstudianteAsignaturaInpDto inpDto) {
         EstudianteAsignatura estudianteAsignatura = validarEstudianteAsignaturaIdBd(id);
-        return mapper.aOutDto(repository.save(validarCampoModificar(estudianteAsignaturaInpDto, estudianteAsignatura)));
+        validarAsignatura(longValue(inpDto.idAsignatura()));
+        validarEstudiante(longValue(inpDto.idEstudiante()));
+        return mapper.aOutDto(repository.save(validarCampoModificar(inpDto, estudianteAsignatura)));
     }
 
-    private EstudianteAsignatura validarCampoModificar(EstudianteAsignaturaInpDto inpDto, EstudianteAsignatura estudianteAsignatura) {
+    private EstudianteAsignatura validarCampoModificar(EstudianteAsignaturaInpDto inpDto,
+                                                       EstudianteAsignatura estudianteAsignatura) {
 
         if (inpDto == null)
             throw new ExceptionGtc("Ingrese la informacion requerida");
 
-        estudianteAsignatura.setNota(inpDto.getNota() != null ? doubleValue(inpDto.getNota()) : estudianteAsignatura.getNota());
-        estudianteAsignatura.setPeriodo(inpDto.getPeriodo() != null ? integerValue(inpDto.getPeriodo()) : estudianteAsignatura.getPeriodo());
-
-        if (inpDto.getIdAsignatura() != null && inpDto.getIdEstudiante() != null) {
-            estudianteAsignatura.setEstudianteAsignaturaFk(new EstudianteAsignaturaFk(longValue(inpDto.getIdEstudiante()),
-                    longValue(inpDto.getIdAsignatura())));
-        }
+        estudianteAsignatura.setNota(inpDto.nota() != null ? doubleValue(inpDto.nota()) : estudianteAsignatura.getNota());
+        estudianteAsignatura.setPeriodo(inpDto.periodo() != null ? integerValue(inpDto.periodo()) : estudianteAsignatura.getPeriodo());
+        estudianteAsignatura.setIdAsignatura(inpDto.idAsignatura() != null ? longValue(inpDto.idAsignatura()) : estudianteAsignatura.getIdAsignatura());
+        estudianteAsignatura.setIdEstudiante(inpDto.idEstudiante() != null ? longValue(inpDto.idEstudiante()) : estudianteAsignatura.getIdEstudiante());
 
         return estudianteAsignatura;
-    }
-
-    private Long longValue(String valor) {
-        return Long.valueOf(valor);
-    }
-
-    private Double doubleValue(String valor) {
-        return Double.parseDouble(valor);
-    }
-
-    private Integer integerValue(String valor) {
-        return Integer.parseInt(valor);
     }
 
     private EstudianteAsignatura validarEstudianteAsignaturaIdBd(Long id) {
@@ -84,5 +78,16 @@ public class EstudianteAsignaturaService implements ICrud<EstudianteAsignaturaRe
             throw new ExceptionGtc("El id " + id + " no esta disponible");
 
         return estudianteAsignatura.get();
+    }
+
+
+    private void validarAsignatura(Long idAsignatura) {
+        if (idAsignatura != null && asignaturaService.getById(idAsignatura) == null)
+            throw new ExceptionGtc("El id grado " + idAsignatura + " no disponible");
+    }
+
+    private void validarEstudiante(Long idEstudiante) {
+        if (idEstudiante != null && estudianteService.getById(idEstudiante) == null)
+            throw new ExceptionGtc("El id asignatura " + idEstudiante + " no disponible");
     }
 }

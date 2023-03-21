@@ -1,12 +1,8 @@
 package com.gtc.service.dto;
 
-import lombok.Data;
+import java.util.Set;
 
-@Data
-public class SDto {
-    private String nombreDocente;
-    private String nombreCurso;
-    private String nombreEstudiante;
-    private String notaEstudiante;
+public record SDto(String nombre, String grado, Set<String> docentes,
+                   Set<String> notas) {
 
 }

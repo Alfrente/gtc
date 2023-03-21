@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface ITipoDocumentoMapper extends IMapper<TipoDocumento, TipoDocumentoInpDto, TipoDocumentoResDto> {
-    @Override
+
     @Mapping(target = "id", ignore = true)
     TipoDocumento aEntidad(TipoDocumentoInpDto inpDto);
 }

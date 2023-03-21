@@ -1,26 +1,14 @@
 package com.gtc.service.dto.response;
 
-import com.gtc.service.dto.response.sin_otra_clase.DescripcionResDto;
-import lombok.Data;
+import com.gtc.service.dto.response.model.DescripcionResDto;
 
 import java.time.LocalDate;
 import java.util.List;
 
+public record EstudianteResDto(Long numeroDocumento, String nombres, String apellidos,
+                               LocalDate fechaNacimiento, String direccion, String email,
+                               Long fijo, Long celular, TipoDocumentoResDto tipoDocumentoResDto,
+                               GradoResDto gradoResDto, DescripcionResDto daneResDto,
+                               List<DescripcionResDto> asignaturaResDtoList) {
 
-@Data
-public class EstudianteResDto {
-
-    private Long numeroDocumento;
-    private String nombres;
-    private String apellidos;
-    private LocalDate fechaNacimiento;
-    private String direccion;
-    private String email;
-    private Long fijo;
-    private Long celular;
-
-    private TipoDocumentoResDto tipoDocumentoResDto;
-    private GradoResDto gradoResDto;
-    private DescripcionResDto daneResDto;
-    private List<DescripcionResDto> asignaturaResDtoList;
 }

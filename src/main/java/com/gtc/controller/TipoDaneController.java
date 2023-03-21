@@ -39,7 +39,7 @@ public class TipoDaneController {
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<TipoDaneResDto> update(@PathVariable("id") Long id, @RequestBody @Valid TipoDaneInpDto inpDto) {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.update(id, inpDto));
+    public ResponseEntity<TipoDaneResDto> update(@PathVariable("id") Long id, @RequestParam("tipoDane") String tipoDane) {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.update(id, tipoDane));
     }
 }

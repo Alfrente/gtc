@@ -6,8 +6,8 @@ import java.util.List;
 
 @Component
 public interface IMapper<ENTIDAD, DTOINPUT, DTOOPUT> {
-    ENTIDAD aEntidad(DTOINPUT dtoinput);
+    ENTIDAD aEntidad(DTOINPUT dto);
     DTOOPUT aOutDto(ENTIDAD entidad);
-    List<ENTIDAD> aEntidadList(List<DTOINPUT> dtoinputList);
+    List<ENTIDAD> aEntidadList(List<DTOINPUT> dtoList);
     List<DTOOPUT> aOutDtoList(List<ENTIDAD> entidadList);
 }

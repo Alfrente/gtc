@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.gtc.util.MetodosEstatico.longValue;
+
 @Service
 @RequiredArgsConstructor
 public class AsignaturaService implements ICrud<AsignaturaRestDto, AsignaturaInpDto> {
@@ -22,6 +24,7 @@ public class AsignaturaService implements ICrud<AsignaturaRestDto, AsignaturaInp
     private final IAsignaturaRepository repository;
     private final IDocenteRepository docenteRepository;
     private final IAsignaturaMapper mapper;
+    private final DocenteService docenteService;
 
     @Override
     public AsignaturaRestDto getById(Long id) {
@@ -34,7 +37,8 @@ public class AsignaturaService implements ICrud<AsignaturaRestDto, AsignaturaInp
     }
 
     @Override
-    public AsignaturaRestDto save(AsignaturaInpDto inpDto) { //
+    public AsignaturaRestDto save(AsignaturaInpDto inpDto) {
+        validaDocente(longValue(inpDto.idDocente()));
         return mapper.aOutDto(repository.save(mapper.aEntidad(inpDto)));
     }
 
@@ -44,10 +48,10 @@ public class AsignaturaService implements ICrud<AsignaturaRestDto, AsignaturaInp
         repository.deleteById(id);
     }
 
-    @Override
     public AsignaturaRestDto update(Long id, AsignaturaInpDto inpDto) {
-       Asignatura asignatura = validarAsignaturaIdBd(id);
-        validarDocenteIdBd(longValue(inpDto.getIdDocente()));
+        Asignatura asignatura = validarAsignaturaIdBd(id);
+        validarDocenteIdBd(longValue(inpDto.idDocente()));
+        validaDocente(longValue(inpDto.idDocente()));
         return mapper.aOutDto(repository.save(validarCampoModificar(inpDto, asignatura)));
     }
 
@@ -70,18 +74,21 @@ public class AsignaturaService implements ICrud<AsignaturaRestDto, AsignaturaInp
         if (docente.isEmpty())
             throw new ExceptionGtc("El id " + id + " de el docente no esta disponible");
     }
+
     private Asignatura validarCampoModificar(AsignaturaInpDto inpDto, Asignatura asignatura) {
 
         if (inpDto == null)
             throw new ExceptionGtc("Ingrese la informacion requerida");
 
-        asignatura.setId(inpDto.getIdDocente() != null ? longValue(inpDto.getIdDocente()) : asignatura.getId());
-        asignatura.setDescripcion(inpDto.getDescripcion() != null ? inpDto.getDescripcion() : asignatura.getDescripcion());
+        asignatura.setId(inpDto.idDocente() != null ? longValue(inpDto.idDocente()) : asignatura.getId());
+        asignatura.setDescripcion(inpDto.descripcion() != null ? inpDto.descripcion() : asignatura.getDescripcion());
 
         return asignatura;
     }
 
-    private Long longValue(String valor) {
-        return Long.valueOf(valor);
+    private void validaDocente(Long idDocente) {
+        if (idDocente != null && docenteService.getById(idDocente) == null)
+            throw new ExceptionGtc("El id docente " + idDocente + " no disponible");
     }
+
 }

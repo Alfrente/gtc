@@ -13,11 +13,14 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.gtc.util.MetodosEstatico.longValue;
+
 @Service
 @RequiredArgsConstructor
 public class DaneService implements ICrud<DaneResDto, DaneInpDto> {
     private final IDaneRepository repository;
     private final IDaneMapper mapper;
+    private final TipoDaneService tipoDaneService;
 
     @Override
     public DaneResDto getById(Long id) {
@@ -30,23 +33,22 @@ public class DaneService implements ICrud<DaneResDto, DaneInpDto> {
     }
 
     @Override
-    public DaneResDto save(DaneInpDto inpDto) { //
+    public DaneResDto save(DaneInpDto inpDto) {
+        validarTipoDane(longValue(inpDto.idTipoDane()));
         return mapper.aOutDto(repository.save(mapper.aEntidad(inpDto)));
     }
 
     @Override
     public void delete(Long id) {
-        validarDocenteIdBd(id);
+        validarDaneBd(id);
         repository.deleteById(id);
     }
 
-    @Override
     public DaneResDto update(Long id, DaneInpDto inpDto) {
-        Dane dane = validarDocenteIdBd(id);
-        return mapper.aOutDto(repository.save(validarCampoModificar(inpDto, dane)));
+        return validarCampoModificar(inpDto, id);
     }
 
-    private Dane validarDocenteIdBd(Long id) {
+    private Dane validarDaneBd(Long id) {
         if (id == null)
             throw new ExceptionGtc("El id esta nulo");
 
@@ -57,18 +59,31 @@ public class DaneService implements ICrud<DaneResDto, DaneInpDto> {
         return dane.get();
     }
 
-    private Dane validarCampoModificar(DaneInpDto inpDto, Dane dane) {
-
+    private DaneResDto validarCampoModificar(DaneInpDto inpDto, Long id) {
         if (inpDto == null)
             throw new ExceptionGtc("Ingrese la informacion requerida");
 
-        dane.setDescripcion(inpDto.getDescripcion() != null ? inpDto.getDescripcion() : dane.getDescripcion());
-        dane.getTipoDane().setId(inpDto.getIdTipoDane() != null ? longValue(inpDto.getIdTipoDane()) : dane.getTipoDane().getId());
+        Dane dane = validarDaneBd(id);
 
-        return dane;
+        DaneInpDto modificado = new DaneInpDto(dane.getDescripcion(), String.valueOf(dane.getIdTipoDane()));
+        if (modificado.equals(inpDto))
+            return mapper.aOutDto(dane);
+
+        validarTipoDane(longValue(inpDto.idTipoDane()));
+
+        dane.setDescripcion(inpDto.descripcion() != null ? inpDto.descripcion() : dane.getDescripcion());
+        dane.setIdTipoDane(inpDto.idTipoDane() != null ? longValue(inpDto.idTipoDane()) : dane.getTipoDane().getId());
+
+        repository.save(dane);
+
+        dane.setTipoDane(tipoDaneService.validarIdBd(dane.getIdTipoDane()));
+
+        return mapper.aOutDto(dane);
     }
 
-    private Long longValue(String valor) {
-        return Long.valueOf(valor);
+    private void validarTipoDane(Long idTipoDane) {
+        if (idTipoDane != null && tipoDaneService.getById(idTipoDane) == null)
+            throw new ExceptionGtc("El id tipo dane " + idTipoDane + " no disponible");
     }
+
 }
