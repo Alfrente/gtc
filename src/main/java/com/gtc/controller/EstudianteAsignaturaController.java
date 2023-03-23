@@ -23,7 +23,7 @@ public class EstudianteAsignaturaController {
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<EstudianteAsignaturaResDto> getById(@PathVariable("id") Long id) {
+    public ResponseEntity<EstudianteAsignaturaResDto> getById(@PathVariable("id") String id) {
         return ResponseEntity.status(HttpStatus.OK).body(service.getById(id));
     }
 
@@ -33,13 +33,13 @@ public class EstudianteAsignaturaController {
     }
 
     @DeleteMapping("/id/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") String id) {
         service.delete(id);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<EstudianteAsignaturaResDto> update(@PathVariable("id") Long id, @RequestBody EstudianteAsignaturaInpDto inpDto) {
+    public ResponseEntity<EstudianteAsignaturaResDto> update(@PathVariable("id") String id, @RequestBody EstudianteAsignaturaInpDto inpDto) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.update(id, inpDto));
     }
 }

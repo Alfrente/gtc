@@ -4,13 +4,13 @@ import java.util.List;
 
 public interface ICrud<O, I> {
 
-    O getById(Long id);
+    O getById(String id);
 
     List<O> getAll();
 
     O save(I i);
 
-    void delete(Long id);
+    void delete(String id);
 
 
 }

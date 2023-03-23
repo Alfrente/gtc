@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.gtc.util.MensajeError.*;
+import static com.gtc.util.MetodoCompartidos.validarId;
+
 @Service
 @RequiredArgsConstructor
 public class TipoDocumentoService implements ICrud<TipoDocumentoResDto, TipoDocumentoInpDto> {
@@ -21,8 +24,8 @@ public class TipoDocumentoService implements ICrud<TipoDocumentoResDto, TipoDocu
     private final ITipoDocumentoMapper mapper;
 
     @Override
-    public TipoDocumentoResDto getById(Long id) {
-        return mapper.aOutDto(repository.findById(id).orElse(null));
+    public TipoDocumentoResDto getById(String id) {
+        return mapper.aOutDto(repository.findById(validarId(id)).orElse(null));
     }
 
     @Override
@@ -36,25 +39,24 @@ public class TipoDocumentoService implements ICrud<TipoDocumentoResDto, TipoDocu
     }
 
     @Override
-    public void delete(Long id) {
-        validarIdBd(id);
-        repository.deleteById(id);
+    public void delete(String id) {
+        validarTipoDocumentoBd(validarId(id));
+        repository.deleteById(validarId(id));
     }
 
-
-    public TipoDocumentoResDto update(Long id, String nuevoTipoDocumento) {
-        TipoDocumento tipoDocumento = validarIdBd(id);
+    public TipoDocumentoResDto update(String id, String nuevoTipoDocumento) {
+        TipoDocumento tipoDocumento = validarTipoDocumentoBd(validarId(id));
         tipoDocumento.setDescripcion(nuevoTipoDocumento);
         return mapper.aOutDto(repository.save(tipoDocumento));
     }
 
-    private TipoDocumento validarIdBd(Long id) {
+    public TipoDocumento validarTipoDocumentoBd(Long id) {
         if (id == null)
-            throw new ExceptionGtc("El id esta nulo");
+            throw new ExceptionGtc(ID_INVALIDO);
 
         Optional<TipoDocumento> tipoDocumento = repository.findById(id);
         if (tipoDocumento.isEmpty())
-            throw new ExceptionGtc("El id " + id + " no esta disponible");
+            throw new ExceptionGtc(EL_ID + id + TIPO_DOCUMENTO_NO_DISPONIBLE);
 
         return tipoDocumento.get();
     }

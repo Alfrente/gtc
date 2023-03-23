@@ -24,7 +24,7 @@ public class TipoDocumentoController {
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<TipoDocumentoResDto> getById(@PathVariable("id") Long id) {
+    public ResponseEntity<TipoDocumentoResDto> getById(@PathVariable("id") String id) {
         return ResponseEntity.status(HttpStatus.OK).body(service.getById(id));
     }
 
@@ -34,13 +34,13 @@ public class TipoDocumentoController {
     }
 
     @DeleteMapping("/id/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") String id) {
         service.delete(id);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<TipoDocumentoResDto> update(@PathVariable("id") Long id, @RequestParam("nuevoTipoDocumento")
+    public ResponseEntity<TipoDocumentoResDto> update(@PathVariable("id") String id, @RequestParam("nuevoTipoDocumento")
     String nuevoTipoDocumento) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.update(id, nuevoTipoDocumento));
     }

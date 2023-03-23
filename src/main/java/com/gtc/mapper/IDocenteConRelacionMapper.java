@@ -19,4 +19,6 @@ public interface IDocenteConRelacionMapper extends IMapper<Docente, DocenteInpDt
     @Mapping(target = "gradoResDto", source = "grado")
     @Mapping(target = "asignaturaOutDtoList", source = "asignaturaList")
     DocenteResDto aOutDto(Docente docente);
+
+    DocenteInpDto aInpDto(Docente docente);
 }

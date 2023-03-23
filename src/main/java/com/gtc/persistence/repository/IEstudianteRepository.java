@@ -1,12 +1,8 @@
 package com.gtc.persistence.repository;
 
 import com.gtc.persistence.entity.Estudiante;
-import com.gtc.service.dto.SDto;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface IEstudianteRepository extends JpaRepository<Estudiante, Long> {

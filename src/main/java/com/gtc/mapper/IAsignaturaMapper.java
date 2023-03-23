@@ -16,4 +16,6 @@ public interface IAsignaturaMapper extends IMapper<Asignatura, AsignaturaInpDto,
 
     @Mapping(target = "estudianteResDtos", source = "estudiantes")
     AsignaturaRestDto aOutDto(Asignatura asignatura);
+
+    AsignaturaInpDto aInpDto(Asignatura asignatura);
 }

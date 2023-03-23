@@ -15,4 +15,6 @@ public interface IDaneMapper extends IMapper<Dane, DaneInpDto, DaneResDto>{
 
     @Mapping(target = "tipoDaneResDto", source = "tipoDane")
     DaneResDto aOutDto(Dane dane);
+
+    DaneInpDto aInpDt(Dane dane);
 }

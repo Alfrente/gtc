@@ -24,7 +24,7 @@ public class DaneController {
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<DaneResDto> getById(@PathVariable("id") Long id) {
+    public ResponseEntity<DaneResDto> getById(@PathVariable("id") String id) {
         return ResponseEntity.status(HttpStatus.OK).body(service.getById(id));
     }
 
@@ -34,13 +34,13 @@ public class DaneController {
     }
 
     @DeleteMapping("/id/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") String id) {
         service.delete(id);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<DaneResDto> update(@PathVariable("id") Long id, @RequestBody DaneInpDto inpDto) {
+    public ResponseEntity<DaneResDto> update(@PathVariable("id") String id, @RequestBody DaneInpDto inpDto) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.update(id, inpDto));
     }
 }

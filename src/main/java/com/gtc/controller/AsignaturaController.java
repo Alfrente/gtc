@@ -24,7 +24,7 @@ public class AsignaturaController {
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<AsignaturaRestDto> getById(@PathVariable("id") Long id) {
+    public ResponseEntity<AsignaturaRestDto> getById(@PathVariable("id") String id) {
         return ResponseEntity.status(HttpStatus.OK).body(service.getById(id));
     }
 
@@ -34,13 +34,13 @@ public class AsignaturaController {
     }
 
     @DeleteMapping("/id/{id}")
-    public ResponseEntity<AsignaturaRestDto> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<AsignaturaRestDto> delete(@PathVariable("id") String id) {
         service.delete(id);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<AsignaturaRestDto> update(@PathVariable("id") Long id, @RequestBody AsignaturaInpDto inpDto) {
+    public ResponseEntity<AsignaturaRestDto> update(@PathVariable("id") String id, @RequestBody AsignaturaInpDto inpDto) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.update(id, inpDto));
     }
 }

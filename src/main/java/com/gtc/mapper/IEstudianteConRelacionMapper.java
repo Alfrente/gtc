@@ -2,6 +2,7 @@ package com.gtc.mapper;
 
 import com.gtc.persistence.entity.Estudiante;
 import com.gtc.service.dto.request.EstudianteInpDto;
+import com.gtc.service.dto.request.update.EstudianteInpUpdDto;
 import com.gtc.service.dto.response.EstudianteResDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,5 +23,7 @@ public interface IEstudianteConRelacionMapper extends IMapper<Estudiante, Estudi
     @Mapping(target = "gradoResDto", source = "grado")
     @Mapping(target = "daneResDto", source = "dane")
     EstudianteResDto aOutDto(Estudiante estudiante);
+
+    EstudianteInpUpdDto aInpUpdDto(Estudiante estudiante);
 
 }

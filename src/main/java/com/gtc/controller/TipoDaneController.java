@@ -23,7 +23,7 @@ public class TipoDaneController {
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<TipoDaneResDto> getById(@PathVariable("id") Long id) {
+    public ResponseEntity<TipoDaneResDto> getById(@PathVariable("id") String id) {
         return ResponseEntity.status(HttpStatus.OK).body(service.getById(id));
     }
 
@@ -33,13 +33,13 @@ public class TipoDaneController {
     }
 
     @DeleteMapping("/id/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") String id) {
         service.delete(id);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<TipoDaneResDto> update(@PathVariable("id") Long id, @RequestParam("tipoDane") String tipoDane) {
+    public ResponseEntity<TipoDaneResDto> update(@PathVariable("id") String id, @RequestParam("tipoDane") String tipoDane) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.update(id, tipoDane));
     }
 }

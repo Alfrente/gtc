@@ -2,8 +2,9 @@ package com.gtc.service.impl;
 
 import com.gtc.exception.ExceptionGtc;
 import com.gtc.mapper.IDocenteConRelacionMapper;
-import com.gtc.mapper.IDocenteMapper;
 import com.gtc.persistence.entity.Docente;
+import com.gtc.persistence.entity.Grado;
+import com.gtc.persistence.entity.TipoDocumento;
 import com.gtc.persistence.repository.IDocenteRepository;
 import com.gtc.service.ICrud;
 import com.gtc.service.dto.request.DocenteInpDto;
@@ -16,7 +17,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.gtc.util.MetodosEstatico.longValue;
+import static com.gtc.util.MensajeError.*;
+import static com.gtc.util.MetodoCompartidos.stringALong;
+import static com.gtc.util.MetodoCompartidos.validarId;
 
 @Service
 @RequiredArgsConstructor
@@ -24,13 +27,12 @@ public class DocenteService implements ICrud<DocenteResDto, DocenteInpDto> {
 
     private final IDocenteRepository repository;
     private final IDocenteConRelacionMapper relacionMapper;
-    private final IDocenteMapper mapper; //
     private final TipoDocumentoService tipoDocumentoService;
     private final GradoService gradoService;
 
     @Override
-    public DocenteResDto getById(Long id) {
-        return relacionMapper.aOutDto(repository.findById(id).orElse(null));
+    public DocenteResDto getById(String id) {
+        return relacionMapper.aOutDto(repository.findById(validarId(id)).orElse(null));
     }
 
     @Override
@@ -41,61 +43,72 @@ public class DocenteService implements ICrud<DocenteResDto, DocenteInpDto> {
     @Override
     @Transactional
     public DocenteResDto save(DocenteInpDto inpDto) {
-        validarTipoDocumento(longValue(inpDto.idTipoDocumento()));
-        validarGrado(longValue(inpDto.idGradoResponsable()));
+        validarTipoDocumento(inpDto.idTipoDocumento());
+        validarGrado(inpDto.idGradoResponsable());
         return relacionMapper.aOutDto(relacionMapper.aEntidad(inpDto));
     }
 
     @Override
     @Transactional
-    public void delete(Long id) {
-        validarDocenteIdBd(id);
-        repository.deleteById(id);
+    public void delete(String id) {
+        validarDocenteIdBd(validarId(id));
+        repository.deleteById(validarId(id));
     }
 
     @Transactional
-    public DocenteResDto update(Long id, DocenteInpDto inpDto) {
-        Docente docente = validarDocenteIdBd(id);
-        validarTipoDocumento(longValue(inpDto.idTipoDocumento()));
-        validarGrado(longValue(inpDto.idGradoResponsable()));
-        return relacionMapper.aOutDto(repository.save(validarCampoModificar(inpDto, docente)));
+    public DocenteResDto update(String id, DocenteInpDto inpDto) {
+        return validarCampoModificar(inpDto, validarId(id));
     }
 
-    private Docente validarDocenteIdBd(Long id) {
+    public Docente validarDocenteIdBd(Long id) {
         if (id == null)
-            throw new ExceptionGtc("El id esta nulo");
+            throw new ExceptionGtc(ID_INVALIDO);
 
-        Optional<com.gtc.persistence.entity.Docente> docente = repository.findById(id);
+        Optional<Docente> docente = repository.findById(id);
         if (docente.isEmpty())
-            throw new ExceptionGtc("El id " + id + " no esta disponible");
+            throw new ExceptionGtc(EL_ID + id + DOCENTE_NO_DISPONIBLE);
 
         return docente.get();
     }
 
-    private Docente validarCampoModificar(DocenteInpDto inpDto, Docente docente) {
+    private void validarTipoDocumento(String idTipoDocumento) {
+        if (idTipoDocumento != null && tipoDocumentoService.getById(idTipoDocumento) == null)
+            throw new ExceptionGtc(EL_ID + idTipoDocumento + TIPO_DOCUMENTO_NO_DISPONIBLE);
+    }
+
+    private void validarGrado(String idGrado) {
+        if (idGrado != null && gradoService.getById(idGrado) == null)
+            throw new ExceptionGtc(EL_ID + idGrado + GRADO_NO_DISPONIBLE);
+    }
+
+    private DocenteResDto validarCampoModificar(DocenteInpDto inpDto, Long id) {
 
         if (inpDto == null)
-            throw new ExceptionGtc("Ingrese la informacion requerida");
+            throw new ExceptionGtc(INGRESE_INFORMACION_REQUERIDA);
 
-        docente.setNumeroDocumento(inpDto.numeroDocumento() != null ? longValue(inpDto.numeroDocumento()) : docente.getNumeroDocumento());
+        Docente docente = validarDocenteIdBd(id);
+        DocenteInpDto db = relacionMapper.aInpDto(docente);
+        if (db.equals(inpDto))
+            return relacionMapper.aOutDto(docente);
+
+        TipoDocumento tipoDocumento = tipoDocumentoService.validarTipoDocumentoBd(stringALong(inpDto.idTipoDocumento()));
+        Grado grado = gradoService.validarGradoBd(stringALong(inpDto.idGradoResponsable()));
+
+        docente.setNumeroDocumento(inpDto.numeroDocumento() != null ? stringALong(inpDto.numeroDocumento()) : docente.getNumeroDocumento());
         docente.setNombres(inpDto.nombres() != null ? inpDto.nombres() : docente.getNombres());
         docente.setApellidos(inpDto.apellidos() != null ? inpDto.apellidos() : docente.getApellidos());
         docente.setFechaNacimiento(inpDto.fechaNacimiento() != null ? LocalDate.parse(inpDto.fechaNacimiento()) : docente.getFechaNacimiento());
         docente.setAsigDictadas(inpDto.asigDictadas() != null ? inpDto.asigDictadas() : docente.getAsigDictadas());
         docente.setGradoEscolaridad(inpDto.gradoEscolaridad() != null ? inpDto.gradoEscolaridad() : docente.getGradoEscolaridad());
         docente.setEmail(inpDto.email() != null ? inpDto.email() : docente.getEmail());
-        docente.setFijo(inpDto.fijo() != null ? longValue(inpDto.fijo()) : docente.getFijo());
-        docente.setCelular(inpDto.celular() != null ? longValue(inpDto.celular()) : docente.getCelular());
+        docente.setFijo(inpDto.fijo() != null ? stringALong(inpDto.fijo()) : docente.getFijo());
+        docente.setCelular(inpDto.celular() != null ? stringALong(inpDto.celular()) : docente.getCelular());
 
-        return docente;
-    }
-    private void validarTipoDocumento(Long idTipoDocumento) {
-        if (idTipoDocumento != null && tipoDocumentoService.getById(idTipoDocumento) == null)
-            throw new ExceptionGtc("El id tipo documento " + idTipoDocumento + " no disponible");
-    }
+        repository.save(docente);
 
-    private void validarGrado(Long idGrado) {
-        if (idGrado != null && gradoService.getById(idGrado) == null)
-            throw new ExceptionGtc("El id grado " + idGrado + " no disponible");
+        docente.setTipoDocumento(tipoDocumento);
+        docente.setGrado(grado);
+
+        return relacionMapper.aOutDto(docente);
     }
 }

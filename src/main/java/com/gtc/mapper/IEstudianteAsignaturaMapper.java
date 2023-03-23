@@ -15,4 +15,6 @@ public interface IEstudianteAsignaturaMapper extends IMapper<EstudianteAsignatur
     EstudianteAsignatura aEntidad(EstudianteAsignaturaInpDto estudianteAsignaturaInpDto);
 
     EstudianteAsignaturaResDto aOutDto(EstudianteAsignatura estudianteAsignatura);
+
+    EstudianteAsignaturaInpDto aInpDto(EstudianteAsignatura estudianteAsignatura);
 }

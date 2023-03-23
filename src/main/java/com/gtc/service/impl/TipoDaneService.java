@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.gtc.util.MensajeError.*;
+import static com.gtc.util.MetodoCompartidos.validarId;
+
 @Service
 @RequiredArgsConstructor
 public class TipoDaneService implements ICrud<TipoDaneResDto, TipoDaneInpDto> {
@@ -21,8 +24,8 @@ public class TipoDaneService implements ICrud<TipoDaneResDto, TipoDaneInpDto> {
     private final ITipoDaneMapper mapper;
 
     @Override
-    public TipoDaneResDto getById(Long id) {
-        return mapper.aOutDto(repository.findById(id).orElse(null));
+    public TipoDaneResDto getById(String id) {
+        return mapper.aOutDto(repository.findById(validarId(id)).orElse(null));
     }
 
     @Override
@@ -36,24 +39,24 @@ public class TipoDaneService implements ICrud<TipoDaneResDto, TipoDaneInpDto> {
     }
 
     @Override
-    public void delete(Long id) {
-        validarIdBd(id);
-        repository.deleteById(id);
+    public void delete(String id) {
+        validarIdBd(validarId(id));
+        repository.deleteById(validarId(id));
     }
 
-    public TipoDaneResDto update(Long id, String nuevoTipoDane) {
-        TipoDane tipoDane = validarIdBd(id);
+    public TipoDaneResDto update(String id, String nuevoTipoDane) {
+        TipoDane tipoDane = validarIdBd(validarId(id));
         tipoDane.setDescripcion(nuevoTipoDane);
         return mapper.aOutDto(tipoDane);
     }
 
     public TipoDane validarIdBd(Long id) {
         if (id == null)
-            throw new ExceptionGtc("El id esta nulo");
+            throw new ExceptionGtc(ID_INVALIDO);
 
         Optional<TipoDane> tipoDane = repository.findById(id);
         if (tipoDane.isEmpty())
-            throw new ExceptionGtc("El id " + id + " no esta disponible");
+            throw new ExceptionGtc(EL_ID + id + TIPO_DANE_NO_DISPONIBLE);
 
         return tipoDane.get();
     }

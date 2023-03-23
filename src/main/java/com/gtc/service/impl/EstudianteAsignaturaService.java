@@ -13,7 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-import static com.gtc.util.MetodosEstatico.*;
+import static com.gtc.util.MensajeError.*;
+import static com.gtc.util.MetodoCompartidos.*;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +27,8 @@ public class EstudianteAsignaturaService implements ICrud<EstudianteAsignaturaRe
 
 
     @Override
-    public EstudianteAsignaturaResDto getById(Long id) {
-        return mapper.aOutDto(repository.findById(id).orElse(null));
+    public EstudianteAsignaturaResDto getById(String id) {
+        return mapper.aOutDto(repository.findById(validarId(id)).orElse(null));
     }
 
     @Override
@@ -37,57 +38,62 @@ public class EstudianteAsignaturaService implements ICrud<EstudianteAsignaturaRe
 
     @Override
     public EstudianteAsignaturaResDto save(EstudianteAsignaturaInpDto inpDto) {
-        validarAsignatura(longValue(inpDto.idAsignatura()));
-        validarEstudiante(longValue(inpDto.idEstudiante()));
+        validarAsignatura(inpDto.idAsignatura());
+        validarEstudiante(inpDto.idEstudiante());
         return mapper.aOutDto(repository.save(mapper.aEntidad(inpDto)));
     }
 
     @Override
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(String id) {
+        validarEstudianteAsignaturaBd(validarId(id));
+        repository.deleteById(validarId(id));
     }
 
 
-    public EstudianteAsignaturaResDto update(Long id, EstudianteAsignaturaInpDto inpDto) {
-        EstudianteAsignatura estudianteAsignatura = validarEstudianteAsignaturaIdBd(id);
-        validarAsignatura(longValue(inpDto.idAsignatura()));
-        validarEstudiante(longValue(inpDto.idEstudiante()));
-        return mapper.aOutDto(repository.save(validarCampoModificar(inpDto, estudianteAsignatura)));
+    public EstudianteAsignaturaResDto update(String id, EstudianteAsignaturaInpDto inpDto) {
+        return validarCampoModificar(inpDto, id);
     }
 
-    private EstudianteAsignatura validarCampoModificar(EstudianteAsignaturaInpDto inpDto,
-                                                       EstudianteAsignatura estudianteAsignatura) {
-
-        if (inpDto == null)
-            throw new ExceptionGtc("Ingrese la informacion requerida");
-
-        estudianteAsignatura.setNota(inpDto.nota() != null ? doubleValue(inpDto.nota()) : estudianteAsignatura.getNota());
-        estudianteAsignatura.setPeriodo(inpDto.periodo() != null ? integerValue(inpDto.periodo()) : estudianteAsignatura.getPeriodo());
-        estudianteAsignatura.setIdAsignatura(inpDto.idAsignatura() != null ? longValue(inpDto.idAsignatura()) : estudianteAsignatura.getIdAsignatura());
-        estudianteAsignatura.setIdEstudiante(inpDto.idEstudiante() != null ? longValue(inpDto.idEstudiante()) : estudianteAsignatura.getIdEstudiante());
-
-        return estudianteAsignatura;
-    }
-
-    private EstudianteAsignatura validarEstudianteAsignaturaIdBd(Long id) {
+    private EstudianteAsignatura validarEstudianteAsignaturaBd(Long id) {
         if (id == null)
-            throw new ExceptionGtc("El id esta nulo");
+            throw new ExceptionGtc(ID_INVALIDO);
 
         Optional<EstudianteAsignatura> estudianteAsignatura = repository.findById(id);
         if (estudianteAsignatura.isEmpty())
-            throw new ExceptionGtc("El id " + id + " no esta disponible");
+            throw new ExceptionGtc(EL_ID + id + ESTUDIANTE_ASIGNATURA_NO_DISPONIBLE);
 
         return estudianteAsignatura.get();
     }
 
-
-    private void validarAsignatura(Long idAsignatura) {
+    private void validarAsignatura(String idAsignatura) {
         if (idAsignatura != null && asignaturaService.getById(idAsignatura) == null)
-            throw new ExceptionGtc("El id grado " + idAsignatura + " no disponible");
+            throw new ExceptionGtc(EL_ID + idAsignatura + ASIGNATURA_NO_DISPONIBLE);
     }
 
-    private void validarEstudiante(Long idEstudiante) {
+    private void validarEstudiante(String idEstudiante) {
         if (idEstudiante != null && estudianteService.getById(idEstudiante) == null)
-            throw new ExceptionGtc("El id asignatura " + idEstudiante + " no disponible");
+            throw new ExceptionGtc(EL_ID + idEstudiante + ESTUDIANTE_NO_DISPONIBLE);
     }
+
+    private EstudianteAsignaturaResDto validarCampoModificar(EstudianteAsignaturaInpDto inpDto, String id) {
+
+        if (inpDto == null)
+            throw new ExceptionGtc(INGRESE_INFORMACION_REQUERIDA);
+
+        EstudianteAsignatura estudianteAsignatura = validarEstudianteAsignaturaBd(validarId(id));
+        EstudianteAsignaturaInpDto db = mapper.aInpDto(estudianteAsignatura);
+        if (db.equals(inpDto))
+            mapper.aOutDto(estudianteAsignatura);
+
+        validarAsignatura(inpDto.idAsignatura());
+        validarEstudiante(inpDto.idEstudiante());
+
+        estudianteAsignatura.setNota(inpDto.nota() != null ? stringADouble(inpDto.nota()) : estudianteAsignatura.getNota());
+        estudianteAsignatura.setPeriodo(inpDto.periodo() != null ? stringAInteger(inpDto.periodo()) : estudianteAsignatura.getPeriodo());
+        estudianteAsignatura.setIdAsignatura(inpDto.idAsignatura() != null ? stringALong(inpDto.idAsignatura()) : estudianteAsignatura.getIdAsignatura());
+        estudianteAsignatura.setIdEstudiante(inpDto.idEstudiante() != null ? stringALong(inpDto.idEstudiante()) : estudianteAsignatura.getIdEstudiante());
+
+        return mapper.aOutDto(estudianteAsignatura);
+    }
+
 }

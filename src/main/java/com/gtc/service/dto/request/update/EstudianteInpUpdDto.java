@@ -11,10 +11,10 @@ public record EstudianteInpUpdDto (
         @Pattern(regexp = NUMERO_DECIMAL + "{10}", message = DOCUMENTO_INVALIDO)
         String numeroDocumento,
 
-        @Pattern(regexp = LETRA, message = INGRESE_NOMBRE)
+        @Pattern(regexp = LETRA+"{3,10}", message = INGRESE_NOMBRE)
         String nombres,
 
-        @Pattern(regexp = LETRA, message = INGRESE_APELLIDO)
+        @Pattern(regexp = LETRA+"{3,10}", message = INGRESE_APELLIDO)
         String apellidos,
 
         @Pattern(regexp = NUMERO + NUMERO_DECIMAL + "{3}-" + NUMERO_DECIMAL + "{2}-" + NUMERO_DECIMAL + "{2}",
@@ -32,14 +32,15 @@ public record EstudianteInpUpdDto (
         @Pattern(regexp = NUMERO_DECIMAL + "{10}", message = CELULAR_INVALIDO)
         String celular,
 
-        @Pattern(regexp = NUMERO + "{6}", message = ID_GRADO_INVALIDO)
+        @Pattern(regexp = NUMERO + "{1,6}", message = ID_GRADO_INVALIDO)
         @Size(min = 1, max = 2000, message = "Tamano superado")
         String idGrado,
 
-        @Pattern(regexp = NUMERO + "{6}", message = "ID_Dane")    /*** **/
+        @Pattern(regexp = NUMERO + "{1,6}", message = ID_DANE_INVALIDO)
         @Size(min = 1, max = 2000, message = "Tamano superado")
         String idDane,
-        @Pattern(regexp = NUMERO + "{6}", message = ID_TIPO_DOCUMENTO_INVALIDO)
+
+        @Pattern(regexp = NUMERO + "{1,6}", message = ID_TIPO_DOCUMENTO_INVALIDO)
         @Size(min = 1, max = 2000, message = "Tamano superado")
         String idTipoDocumento
 ){

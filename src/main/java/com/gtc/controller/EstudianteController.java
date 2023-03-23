@@ -1,10 +1,9 @@
 package com.gtc.controller;
 
-import com.gtc.persistence.entity.Estudiante;
-import com.gtc.service.dto.SDto;
+import com.gtc.service.dto.EstudiantePerRespDto;
 import com.gtc.service.dto.request.EstudianteInpDto;
-import com.gtc.service.dto.response.EstudianteResDto;
 import com.gtc.service.dto.request.update.EstudianteInpUpdDto;
+import com.gtc.service.dto.response.EstudianteResDto;
 import com.gtc.service.impl.EstudianteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,12 +25,12 @@ public class EstudianteController {
     }
 
     @GetMapping("/nota")
-    public ResponseEntity<List<SDto>> getEstudianteNotas() {
-        return ResponseEntity.status(HttpStatus.OK).body(service.getEstudiantesJoinNota());
+    public ResponseEntity<List<EstudiantePerRespDto>> getEstudianteNotas() {
+        return ResponseEntity.status(HttpStatus.OK).body(service.getEstudiantesPer());
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<EstudianteResDto> getById(@PathVariable("id") Long id) {
+    public ResponseEntity<EstudianteResDto> getById(@PathVariable("id") String id) {
         return ResponseEntity.status(HttpStatus.OK).body(service.getById(id));
     }
 
@@ -41,13 +40,13 @@ public class EstudianteController {
     }
 
     @DeleteMapping("/id/{id}")
-    public ResponseEntity<EstudianteResDto> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<EstudianteResDto> delete(@PathVariable("id") String id) {
         service.delete(id);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<EstudianteResDto> update(@PathVariable("id") Long id, @RequestBody @Valid EstudianteInpUpdDto inpDto) {
+    public ResponseEntity<EstudianteResDto> update(@PathVariable("id") String id, @RequestBody @Valid EstudianteInpUpdDto inpDto) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.update(id, inpDto));
     }
 }

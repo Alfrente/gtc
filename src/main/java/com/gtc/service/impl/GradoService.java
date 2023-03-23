@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.gtc.util.MensajeError.*;
+import static com.gtc.util.MetodoCompartidos.validarId;
+
 @Service
 @RequiredArgsConstructor
 public class GradoService implements ICrud<GradoResDto, GradoInpDto> {
@@ -20,8 +23,8 @@ public class GradoService implements ICrud<GradoResDto, GradoInpDto> {
     private final IGradoMapper mapper;
 
     @Override
-    public GradoResDto getById(Long id) {
-        return mapper.aOutDto(repository.findById(id).orElse(null));
+    public GradoResDto getById(String id) {
+        return mapper.aOutDto(repository.findById(validarId(id)).orElse(null));
     }
 
     @Override
@@ -35,26 +38,24 @@ public class GradoService implements ICrud<GradoResDto, GradoInpDto> {
     }
 
     @Override
-    public void delete(Long id) {
-        validarIdBd(id);
-        repository.deleteById(id);
+    public void delete(String id) {
+        validarGradoBd(validarId(id));
+        repository.deleteById(validarId(id));
     }
 
-    public GradoResDto update(Long id, String nuevoTipoDane) {
-        Grado grado = validarIdBd(id);
-        grado.setDescripcion(nuevoTipoDane);
+    public GradoResDto update(String id, String descripcion) {
+        Grado grado = validarGradoBd(validarId(id));
+        grado.setDescripcion(descripcion);
         return mapper.aOutDto(repository.save(grado));
     }
 
-
-
-    private Grado validarIdBd(Long id) {
+    public Grado validarGradoBd(Long id) {
         if (id == null)
-            throw new ExceptionGtc("El id esta nulo");
+            throw new ExceptionGtc(ID_INVALIDO);
 
         Optional<Grado> grado = repository.findById(id);
         if (grado.isEmpty())
-            throw new ExceptionGtc("El id " + id + " no esta disponible");
+            throw new ExceptionGtc(EL_ID+ id + GRADO_NO_DISPONIBLE);
 
         return grado.get();
     }
